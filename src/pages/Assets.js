@@ -229,7 +229,10 @@ const Assets = () => {
                       getHeaderProps,
                       getTableProps,
                       getRowProps,
-                    }) => (
+                    }) => {
+                      const tableProps = getTableProps();
+                      const { key: _tableKey, ...tableRest } = tableProps || {};
+                      return (
                       <TableContainer
                         title="Asset Inventory"
                         description="Deep visibility into underlying cloud provider resources."
@@ -253,131 +256,78 @@ const Assets = () => {
                           </TableToolbarContent>
                         </TableToolbar>
                         <Table
-                          {...getTableProps()}
+                          {...tableRest}
                           size="lg"
                         >
                           <TableHead>
-                            <TableRow>
-                              <TableExpandHeader />
-                              {headers.map((header) => (
-                                <TableHeader
-                                  {...getHeaderProps({
-                                    header,
-                                  })}
-                                  key={header.key}
-                                >
-                                  {header.header}
-                                </TableHeader>
-                              ))}
-                              <TableHeader />
-                            </TableRow>
+                              <TableRow>
+                                <TableExpandHeader />
+                                {headers.map((header) => {
+                                  const hp = getHeaderProps({ header });
+                                  const { key: _h, ...hpRest } = hp || {};
+                                  return (
+                                    <TableHeader
+                                      {...hpRest}
+                                      key={header.key}
+                                    >
+                                      {header.header}
+                                    </TableHeader>
+                                  );
+                                })}
+                                <TableHeader />
+                              </TableRow>
                           </TableHead>
                           <TableBody>
                             {rows.map((row) => {
-                              const fullAsset =
-                                assetById.get(row.id);
+                              const fullAsset = assetById.get(row.id);
+                              const rp = getRowProps({ row });
+                              const { key: _r, ...rpRest } = rp || {};
                               return (
-                                <React.Fragment
-                                  key={row.id}
-                                >
-                                  <TableExpandRow
-                                    {...getRowProps({
-                                      row,
-                                    })}
-                                  >
-                                    {row.cells.map(
-                                      (cell) => (
-                                        <TableCell
-                                          key={cell.id}
-                                        >
-                                          {cell.info
-                                            .header ===
-                                          "totalCost" ? (
-                                            <span className="cost-cell">
-                                              {toCurrency(
-                                                cell.value,
-                                                currency
-                                              )}
-                                            </span>
-                                          ) : cell.info
-                                              .header ===
-                                            "category" ? (
-                                            <Tag
-                                              type={
-                                                (cell.value ||
-                                                  "")
-                                                  .toLowerCase() ===
-                                                "compute"
-                                                  ? "blue"
-                                                  : "cyan"
-                                              }
-                                            >
-                                              {cell.value}
-                                            </Tag>
-                                          ) : (
-                                            cell.value
-                                          )}
-                                        </TableCell>
-                                      )
-                                    )}
+                                <React.Fragment key={row.id}>
+                                  <TableExpandRow {...rpRest}>
+                                    {row.cells.map((cell) => (
+                                      <TableCell key={cell.id}>
+                                        {cell.info.header === "totalCost" ? (
+                                          <span className="cost-cell">
+                                            {toCurrency(cell.value, currency)}
+                                          </span>
+                                        ) : cell.info.header === "category" ? (
+                                          <Tag
+                                            type={(cell.value || "").toLowerCase() === "compute" ? "blue" : "cyan"}
+                                          >
+                                            {cell.value}
+                                          </Tag>
+                                        ) : (
+                                          cell.value
+                                        )}
+                                      </TableCell>
+                                    ))}
                                     <TableCell>
-                                      <OverflowMenu
-                                        flipped
-                                        size="sm"
-                                      >
-                                        <OverflowMenuItem
-                                          itemText="Provider Console"
-                                          renderIcon={Launch}
-                                        />
+                                      <OverflowMenu flipped size="sm">
+                                        <OverflowMenuItem itemText="Provider Console" renderIcon={Launch} />
                                         <OverflowMenuItem itemText="View Allocations" />
                                       </OverflowMenu>
                                     </TableCell>
                                   </TableExpandRow>
-                                  <TableExpandedRow
-                                    colSpan={
-                                      headers.length + 2
-                                    }
-                                  >
+                                  <TableExpandedRow colSpan={headers.length + 2}>
                                     <div className="expanded-asset-content">
                                       <Grid>
-                                        <Column
-                                          lg={8}
-                                          md={4}
-                                        >
-                                          <Heading className="sub-heading">
-                                            Identity
-                                          </Heading>
+                                        <Column lg={8} md={4}>
+                                          <Heading className="sub-heading">Identity</Heading>
                                           <p className="detail-item">
-                                            <strong>
-                                              Provider
-                                              ID:
-                                            </strong>{" "}
-                                            <code>
-                                              {fullAsset?.providerId ||
-                                                "—"}
-                                            </code>
+                                            <strong>Provider ID:</strong>{" "}
+                                            <code>{fullAsset?.providerId || "—"}</code>
                                           </p>
                                           <p className="detail-item">
-                                            <strong>
-                                              Cluster:
-                                            </strong>{" "}
-                                            {fullAsset?.cluster ||
-                                              "Unknown"}
+                                            <strong>Cluster:</strong>{" "}
+                                            {fullAsset?.cluster || "Unknown"}
                                           </p>
                                         </Column>
-                                        <Column
-                                          lg={8}
-                                          md={4}
-                                        >
-                                          <Heading className="sub-heading">
-                                            Resource
-                                            Breakdown
-                                          </Heading>
+                                        <Column lg={8} md={4}>
+                                          <Heading className="sub-heading">Resource Breakdown</Heading>
                                           <div className="cost-mini-grid">
                                             <div>
-                                              <span className="caption">
-                                                CPU
-                                              </span>
+                                              <span className="caption">CPU</span>
                                               <p className="cost-value">
                                                 {toCurrency(
                                                   fullAsset?.cpuCost ||
@@ -409,7 +359,8 @@ const Assets = () => {
                           </TableBody>
                         </Table>
                       </TableContainer>
-                    )}
+                    );
+                  }}
                   </DataTable>
                 )}
                 <Pagination
