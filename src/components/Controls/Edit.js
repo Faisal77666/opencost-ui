@@ -8,16 +8,16 @@ import React from "react";
 import SelectWindow from "../SelectWindow";
 
 function EditControl({
-  windowOptions,
+  windowOptions = [],
   window,
   setWindow,
-  aggregationOptions,
+  aggregationOptions = [],
   aggregateBy,
   setAggregateBy,
-  accumulateOptions,
+  accumulateOptions = [],
   accumulate,
   setAccumulate,
-  currencyOptions,
+  currencyOptions = [],
   currency,
   setCurrency,
 }) {
@@ -65,9 +65,9 @@ function EditControl({
           value={currency}
           onChange={(e) => setCurrency(e.target.value)}
         >
-          {currencyOptions?.map((currency) => (
-            <MenuItem key={currency} value={currency}>
-              {currency}
+          {currencyOptions.map((c) => (
+            <MenuItem key={c} value={c}>
+              {c}
             </MenuItem>
           ))}
         </Select>
